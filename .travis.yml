@@ -1,0 +1,20 @@
+sudo: required
+dist: xenial
+services:
+- docker
+env:
+  global:
+  - PATH=$HOME/.local/bin:$PATH
+  - PKGFORGE_STATEFILE=/tmp/pkgforge
+  - BUCKET=akerl-feefifofum
+before_install:
+- pip install --user awscli
+script: make
+deploy:
+  provider: script
+  script: make release && aws s3 cp pkg/payload.zip "s3://$BUCKET/$TRAVIS_TAG.zip"
+  skip_cleanup: true
+  on:
+    tags: true
+notifications:
+  email: false
